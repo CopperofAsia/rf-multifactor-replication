@@ -47,6 +47,16 @@ def main():
     model = pack["model"]
     factor_cols = pack["factor_cols"]
 
+    # 特征重要性：每个因子对模型的贡献程度，保存为 CSV
+    importance = model.feature_importances_
+    fi_df = pd.DataFrame({
+        "factor": factor_cols,
+        "importance": importance,
+    }).sort_values("importance", ascending=False).reset_index(drop=True)
+    fi_path = OUTPUT_DIR / "feature_importance.csv"
+    fi_df.to_csv(fi_path, index=False, encoding="utf-8-sig")
+    print("Saved feature importance:", fi_path)
+
     # 读取数据
     panel = pd.read_parquet(INTERIM_DIR / "panel_with_labels.parquet")
     panel = panel.sort_values(["trade_date", "ts_code"]).reset_index(drop=True)
